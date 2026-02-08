@@ -1,19 +1,12 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
 
-  - The primary key for the `User` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - Added the required column `email` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `name` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `password` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "User" DROP CONSTRAINT "User_pkey",
-ADD COLUMN     "email" TEXT NOT NULL,
-ADD COLUMN     "name" TEXT NOT NULL,
-ADD COLUMN     "password" TEXT NOT NULL,
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ADD CONSTRAINT "User_pkey" PRIMARY KEY ("id");
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Zap" (
@@ -57,8 +50,28 @@ CREATE TABLE "AvailableAction" (
     CONSTRAINT "AvailableAction_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ZapRun" (
+    "id" TEXT NOT NULL,
+    "zapId" TEXT NOT NULL,
+    "metadata" JSONB NOT NULL,
+
+    CONSTRAINT "ZapRun_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ZapRunOutbox" (
+    "id" TEXT NOT NULL,
+    "zapId" TEXT NOT NULL,
+
+    CONSTRAINT "ZapRunOutbox_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Trigger_zapId_key" ON "Trigger"("zapId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ZapRunOutbox_zapId_key" ON "ZapRunOutbox"("zapId");
 
 -- AddForeignKey
 ALTER TABLE "Trigger" ADD CONSTRAINT "Trigger_triggerId_fkey" FOREIGN KEY ("triggerId") REFERENCES "AvailableTrigger"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -71,3 +84,9 @@ ALTER TABLE "Action" ADD CONSTRAINT "Action_zapId_fkey" FOREIGN KEY ("zapId") RE
 
 -- AddForeignKey
 ALTER TABLE "Action" ADD CONSTRAINT "Action_actionId_fkey" FOREIGN KEY ("actionId") REFERENCES "AvailableAction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ZapRun" ADD CONSTRAINT "ZapRun_zapId_fkey" FOREIGN KEY ("zapId") REFERENCES "Zap"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ZapRunOutbox" ADD CONSTRAINT "ZapRunOutbox_zapId_fkey" FOREIGN KEY ("zapId") REFERENCES "ZapRun"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
