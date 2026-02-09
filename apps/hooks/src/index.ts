@@ -12,14 +12,14 @@ app.post('/hook/catch/:userId/:zapId', async(req:Request, res:Response) => {
 
     try {
         await prisma.$transaction(async tx => {
-            const run = await prisma.zapRun.create({
+            const run = await tx.zapRun.create({
                 data : {
                     //@ts-ignore
                     zapId: zapId
                 }
             })
 
-            await prisma.zapRunOutbox.create({
+            await tx.zapRunOutbox.create({
                 data : {
                     //@ts-ignore
                     zapRunId: run.id

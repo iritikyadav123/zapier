@@ -1,0 +1,1 @@
+export const kafka_topic = "zapier-queue"
